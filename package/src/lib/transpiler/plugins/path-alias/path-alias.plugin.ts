@@ -1,8 +1,8 @@
 import type { TranspilerPlugin, TsconfigObject, VisitorFunction } from '../../interfaces/index.ts';
 import type { PathAliasPluginInject, PathAliasObject } from './path-alias.plugin.inject.ts';
-import type { StringLiteral } from 'typescript';
+import type { StringLiteral } from '@typescript/typescript6';
 
-import { isStringLiteral, isImportDeclaration, isCallExpression, factory, SyntaxKind, isExportDeclaration } from 'typescript';
+import { isStringLiteral, isImportDeclaration, isCallExpression, factory, SyntaxKind, isExportDeclaration } from '@typescript/typescript6';
 import { PathAlias } from '../../../path-alias/index.ts';
 
 export class PathAliasPlugin implements TranspilerPlugin {

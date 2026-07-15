@@ -4,7 +4,7 @@ A `ts-node` replacement with path alias resolution, using TSC under the hood.
 ## Basic usage
 -   Install the package:
     ```shell
-    npm i --save-dev @bleed-believer/cli
+    npm i --save-dev @bleed-believer/cli typescript
     ```
 
 -   Next, launch your application:

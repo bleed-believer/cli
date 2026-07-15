@@ -1,8 +1,8 @@
 import type { TsconfigObject, TranspilerInject, TranspilerPlugin } from './interfaces/index.ts';
-import type { ResolutionMode, StringLiteral } from 'typescript';
+import type { ResolutionMode, StringLiteral } from '@typescript/typescript6';
 
-import { factory, isCallExpression, isImportDeclaration, isStringLiteral } from 'typescript';
-import { ModuleKind, ModuleResolutionKind, ScriptTarget, SyntaxKind } from 'typescript';
+import { factory, isCallExpression, isImportDeclaration, isStringLiteral } from '@typescript/typescript6';
+import { ModuleKind, ModuleResolutionKind, ScriptTarget, SyntaxKind } from '@typescript/typescript6';
 import { resolve, dirname, parse, sep } from 'node:path/posix';
 import { Transpiler } from './transpiler.ts';
 import { test } from 'node:test';

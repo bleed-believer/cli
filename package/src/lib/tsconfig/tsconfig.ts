@@ -1,7 +1,7 @@
 import type { TsconfigLoadInject } from './interfaces/index.ts';
-import type { CompilerOptions } from 'typescript';
+import type { CompilerOptions } from '@typescript/typescript6';
 
-import { readConfigFile, convertCompilerOptionsFromJson } from 'typescript';
+import { readConfigFile, convertCompilerOptionsFromJson } from '@typescript/typescript6';
 import { basename, dirname, normalize, resolve } from 'node:path';
 import { readFileSync } from 'node:fs';
 

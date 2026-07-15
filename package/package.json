@@ -1,6 +1,6 @@
 {
   "name": "@bleed-believer/cli",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "A ts-node replacement with path alias resolution",
   "type": "module",
   "module": "./dist/index.js",
@@ -59,10 +59,11 @@
   },
   "homepage": "https://github.com/bleed-believer/cli#readme",
   "dependencies": {
-    "json5": "^2.2.3"
+    "@typescript/typescript6": "^6.0.0",
+    "json5": "^2.0.0"
   },
   "peerDependencies": {
-    "typescript": "^6.0.0"
+    "typescript": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^25.5.2"

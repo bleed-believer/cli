@@ -1,8 +1,8 @@
 import type { TranspilerInject, TranspilerOutput, TranspilerPlugin, TsconfigObject, VisitorResult } from './interfaces/index.ts';
-import type { TransformationContext, SourceFile, Visitor, Transformer } from 'typescript';
+import type { TransformationContext, SourceFile, Visitor, Transformer } from '@typescript/typescript6';
 
-import { getImpliedNodeFormatForFile, sys, ModuleKind, ModuleResolutionKind } from 'typescript';
-import { visitEachChild, transpileModule, JSDocParsingMode, visitNode } from 'typescript';
+import { getImpliedNodeFormatForFile, sys, ModuleKind, ModuleResolutionKind } from '@typescript/typescript6';
+import { visitEachChild, transpileModule, JSDocParsingMode, visitNode } from '@typescript/typescript6';
 import { dirname, parse, resolve, sep } from 'node:path';
 import { TranspilerError } from './transpiler.error.ts';
 import { PathAlias } from '../path-alias/index.ts';

@@ -1,8 +1,8 @@
 import type { PathAliasInject, TsconfigObject } from './interfaces/index.ts';
 
 import { sep, dirname, resolve, relative } from 'node:path/posix';
-import { fileURLToPath } from 'node:url';
 import { describe, test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { PathAlias } from './path-alias.ts';
 
 const files = [

@@ -1,7 +1,7 @@
 import type { TsconfigObject, TranspilerInject } from '../../interfaces/index.ts';
 
 import { resolve, dirname, parse, sep, relative } from 'node:path/posix';
-import { ModuleKind, ModuleResolutionKind } from 'typescript';
+import { ModuleKind, ModuleResolutionKind } from '@typescript/typescript6';
 import { describe, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 

@@ -1,7 +1,7 @@
 import type { TsconfigLoadInject } from './interfaces/index.ts';
-import type { Diagnostic } from 'typescript';
+import type { Diagnostic } from '@typescript/typescript6';
 
-import { DiagnosticCategory, ModuleKind, ModuleResolutionKind, ScriptTarget } from 'typescript';
+import { DiagnosticCategory, ModuleKind, ModuleResolutionKind, ScriptTarget } from '@typescript/typescript6';
 import { resolve, normalize, basename, dirname } from 'node:path/posix';
 import { Tsconfig } from './tsconfig.ts';
 import { test } from 'node:test';
