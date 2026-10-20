@@ -1,0 +1,1 @@
+export type { AuditorResult } from './auditor-result.ts';

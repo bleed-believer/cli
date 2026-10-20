@@ -1,1 +1,0 @@
-export type { TsconfigLoadInject } from './tsconfig-base.load.inject.ts';

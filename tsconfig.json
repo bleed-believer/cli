@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "es2025",
+        "module": "node20",
+        "moduleResolution": "node16",
+
+        "noEmit": true,
+        "strict": true,
+        "verbatimModuleSyntax": true,
+        "emitDecoratorMetadata": false,
+        "experimentalDecorators": false,
+        "allowImportingTsExtensions": true,
+
+        "outDir": "./dist",
+        "rootDir": "./src",
+
+        "types": [ "node" ],
+        "paths": {
+            "#tools/*": [ "./src/tools/*" ]
+        }
+    }
+}
