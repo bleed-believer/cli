@@ -1,1 +1,0 @@
-export { Tsconfig } from './tsconfig.ts';

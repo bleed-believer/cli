@@ -1,0 +1,23 @@
+{
+    "$schema": "https://swc.rs/schema.json",
+    "module": {
+        "type": "es6",
+        "strict": true,
+        "resolveFully": true,
+        "outFileExtension": "js"
+    },
+    "jsc": {
+        "target": "esnext",
+        "parser": {
+            "syntax": "typescript"
+        },
+        "baseUrl": "./",
+        "transform": {
+            "verbatimModuleSyntax": true
+        }
+    },
+    "isModule": true,
+    "exclude": [
+        "./**/*.test.ts"
+    ]
+}
