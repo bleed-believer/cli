@@ -8,10 +8,10 @@ function createParser(required?: boolean) {
     return new ObjectParser({
         required,
         keys: {
-            target: new LiteralParser(
-                [ 'esnext', 'esm' ],
-                { ignoreCase: true }
-            ),
+            target: new LiteralParser({
+                values: [ 'esnext', 'esm' ],
+                ignoreCase: true
+            }),
             strict: new BooleanParser(),
             watch: new BooleanParser({ required: true })
         }

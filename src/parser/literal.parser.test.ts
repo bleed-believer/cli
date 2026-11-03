@@ -14,7 +14,7 @@ interface TestCase {
 
 interface TestSuite {
     values: [ string, ...string[] ];
-    options: LiteralParserOptions;
+    options: Omit<LiteralParserOptions, 'values'>;
     testCases?: TestCase[];
     testError?: ErrorConstructor;
 }
@@ -180,7 +180,7 @@ describe(`LiteralParser`, () => {
             if (testError) {
                 it(`Throws ${testError.name}`, (t: it.TestContext) => {
                     t.assert.throws(
-                        () => new LiteralParser(values, options),
+                        () => new LiteralParser({ ...options, values }),
                         testError
                     );
                 });
@@ -192,7 +192,7 @@ describe(`LiteralParser`, () => {
                         case 'undefined': {
                             const title = `input = ${JSON.stringify(input)}; expects ${JSON.stringify(expected)}`;
                             it(title, (t: it.TestContext) => {
-                                const p = new LiteralParser(values, options);
+                                const p = new LiteralParser({ ...options, values });
                                 const v = p.parse(input);
                                 t.assert.strictEqual(v, expected);
                             });
@@ -202,7 +202,7 @@ describe(`LiteralParser`, () => {
                         default: {
                             const title = `input = ${JSON.stringify(input)}; expects ${expected.name}`;
                             it(title, (t: it.TestContext) => {
-                                const p = new LiteralParser(values, options);
+                                const p = new LiteralParser({ ...options, values });
                                 t.assert.throws(
                                     () => p.parse(input),
                                     expected

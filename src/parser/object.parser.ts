@@ -3,16 +3,47 @@ import type { ObjectParserOptions, ObjectParserResult, ParserResult } from './in
 import { InvalidValueError, RequiredValueError } from './errors/index.ts';
 import { Parser } from './parser.ts';
 
+/**
+ * Parses an object with a known set of keys, each one with its own parser.
+ * Unknown keys are ignored.
+ *
+ * @example
+ * ```ts
+ * const parser = new ObjectParser({
+ *     keys: {
+ *         name: new StringParser({ required: true }),
+ *         strict: new BooleanParser()
+ *     }
+ * });
+ *
+ * parser.parse({ name: 'foo', other: 666 });     // { name: 'foo' }
+ * parser.parse({ strict: true });                // throws RequiredValueError
+ * ```
+ */
 export class ObjectParser<
     O extends ObjectParserOptions
 > extends Parser<ObjectParserResult<O>, O> {
+    /** The parser of every declared key. */
     #keys: O['keys'];
 
+    /**
+     * @param options The options of the parser.
+     */
     constructor(options: O) {
         super(options);
         this.#keys = options.keys;
     }
 
+    /**
+     * Validates that the input is an object and parses each declared key.
+     * Only own properties are read, and the keys that result in `undefined`
+     * are omitted from the output.
+     * @param input The raw value to parse.
+     * @throws {RequiredValueError} If `input` is `undefined` and the parser is required.
+     * @throws {InvalidValueError} If `input` is `null`, an array, a `Date` or not an object.
+     * @throws Any error thrown by the parser of a key.
+     * @returns A new object with the parsed keys.
+     */
     parse(input: unknown): ParserResult<ObjectParserResult<O>, O>;
     parse(input: unknown): ObjectParserResult<O> | undefined {
         switch (typeof input) {

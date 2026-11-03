@@ -22,10 +22,10 @@ function isItemError(index: number, cause: ErrorValidator): ErrorValidator {
 function createParser(required?: boolean) {
     return new ArrayParser({
         required,
-        parser: new LiteralParser(
-            [ 'esnext', 'esm' ],
-            { ignoreCase: true }
-        )
+        parser: new LiteralParser({
+            values: [ 'esnext', 'esm' ],
+            ignoreCase: true
+        })
     });
 }
 
@@ -263,7 +263,7 @@ describe('ArrayParser', () => {
                 keys: {
                     targets: new ArrayParser({
                         required: true,
-                        parser: new LiteralParser([ 'esnext', 'esm' ], { ignoreCase: true })
+                        parser: new LiteralParser({ values: [ 'esnext', 'esm' ], ignoreCase: true })
                     })
                 }
             });

@@ -3,6 +3,10 @@ import { inspect } from 'node:util';
 /**
  * Describes a received value the same way Node.js does in its
  * `ERR_INVALID_ARG_TYPE` messages.
+ *
+ * @param value The value to describe.
+ * @returns A description such as `type string ('foo')`, `an instance of Date`
+ * or `null`.
  */
 export function describeValue(value: unknown): string {
     if (value === null || value === undefined) {
