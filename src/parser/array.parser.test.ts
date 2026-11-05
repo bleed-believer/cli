@@ -1,4 +1,4 @@
-import { InvalidValueError, ParseArrayError, RequiredValueError } from './errors/index.ts';
+import { InvalidLiteralError, InvalidValueError, ParseArrayError, ParseObjectError, RequiredValueError } from './errors/index.ts';
 import { BooleanParser } from './boolean.parser.ts';
 import { LiteralParser } from './literal.parser.ts';
 import { ObjectParser } from './object.parser.ts';
@@ -138,19 +138,19 @@ describe('ArrayParser', () => {
             t.assert.deepStrictEqual(input, [ 'ESM', 'ESNext' ]);
         });
 
-        it(`invalid item; throws ParseArrayError caused by InvalidValueError`, (t: it.TestContext) => {
+        it(`invalid item; throws ParseArrayError caused by InvalidLiteralError`, (t: it.TestContext) => {
             const p = createParser();
             t.assert.throws(
                 () => p.parse([ 'esm', 'esmss' ]),
-                isItemError(1, isError(InvalidValueError))
+                isItemError(1, isError(InvalidLiteralError))
             );
         });
 
-        it(`null item; throws ParseArrayError caused by InvalidValueError`, (t: it.TestContext) => {
+        it(`null item; throws ParseArrayError caused by InvalidLiteralError`, (t: it.TestContext) => {
             const p = createParser();
             t.assert.throws(
                 () => p.parse([ 'esm', null ]),
-                isItemError(1, isError(InvalidValueError))
+                isItemError(1, isError(InvalidLiteralError))
             );
         });
 
@@ -245,7 +245,7 @@ describe('ArrayParser', () => {
             t.assert.deepStrictEqual(v, [ { strict: true }, { strict: false } ]);
         });
 
-        it(`array of objects; missing required key; throws ParseArrayError caused by RequiredValueError`, (t: it.TestContext) => {
+        it(`array of objects; missing required key; throws ParseArrayError → ParseObjectError chain`, (t: it.TestContext) => {
             const p = new ArrayParser({
                 parser: new ObjectParser({
                     keys: { strict: new BooleanParser({ required: true }) }
@@ -254,7 +254,11 @@ describe('ArrayParser', () => {
 
             t.assert.throws(
                 () => p.parse([ { strict: true }, {} ]),
-                isItemError(1, isError(RequiredValueError))
+                isItemError(1, (err: unknown) =>
+                    err instanceof ParseObjectError &&
+                    err.key === 'strict' &&
+                    err.cause instanceof RequiredValueError
+                )
             );
         });
 
@@ -289,7 +293,7 @@ describe('ArrayParser', () => {
             const p = createParser();
             t.assert.throws(
                 () => p.parse([ 'caca', 'esm' ]),
-                isItemError(0, isError(InvalidValueError))
+                isItemError(0, isError(InvalidLiteralError))
             );
         });
 
@@ -322,14 +326,17 @@ describe('ArrayParser', () => {
             t.assert.throws(() => p.parse(undefined), RequiredValueError);
         });
 
-        it(`propagates unchanged through ObjectParser`, (t: it.TestContext) => {
+        it(`wrapped by ObjectParser in a ParseObjectError`, (t: it.TestContext) => {
             const p = new ObjectParser({
                 keys: { flags: new ArrayParser({ parser: new BooleanParser() }) }
             });
 
             t.assert.throws(
                 () => p.parse({ flags: [ true, 'caca' ] }),
-                isItemError(1, isError(InvalidValueError))
+                (err: unknown) =>
+                    err instanceof ParseObjectError &&
+                    err.key === 'flags' &&
+                    isItemError(1, isError(InvalidValueError))(err.cause)
             );
         });
     });

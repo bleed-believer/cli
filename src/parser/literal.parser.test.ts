@@ -1,6 +1,6 @@
 import type { LiteralParserOptions } from './interfaces/index.ts';
 
-import { RequiredValueError, InvalidValueError, DuplicatedValueError } from './errors/index.ts';
+import { RequiredValueError, InvalidLiteralError, InvalidValueError, DuplicatedValueError } from './errors/index.ts';
 import { LiteralParser } from './literal.parser.ts';
 import { describe, it } from 'node:test';
 
@@ -32,7 +32,7 @@ const suites: TestSuite[] = [
             { input: 'FOO',     expected: 'foo' },
             { input: 'BAR',     expected: 'bar' },
             { input: undefined, expected: RequiredValueError },
-            { input: 666,       expected: InvalidValueError }
+            { input: 666,       expected: InvalidLiteralError }
         ]
     },
     {
@@ -44,10 +44,10 @@ const suites: TestSuite[] = [
         testCases: [
             { input: 'foo',     expected: 'foo' },
             { input: 'bar',     expected: 'bar' },
-            { input: 'FOO',     expected: InvalidValueError },
-            { input: 'BAR',     expected: InvalidValueError },
+            { input: 'FOO',     expected: InvalidLiteralError },
+            { input: 'BAR',     expected: InvalidLiteralError },
             { input: undefined, expected: RequiredValueError },
-            { input: 666,       expected: InvalidValueError }
+            { input: 666,       expected: InvalidLiteralError }
         ]
     },
     {
@@ -62,7 +62,7 @@ const suites: TestSuite[] = [
             { input: 'FOO',     expected: 'foo' },
             { input: 'BAR',     expected: 'bar' },
             { input: undefined, expected: undefined },
-            { input: 666,       expected: InvalidValueError }
+            { input: 666,       expected: InvalidLiteralError }
         ]
     },
     {
@@ -74,10 +74,10 @@ const suites: TestSuite[] = [
         testCases: [
             { input: 'foo',     expected: 'foo' },
             { input: 'bar',     expected: 'bar' },
-            { input: 'FOO',     expected: InvalidValueError },
-            { input: 'BAR',     expected: InvalidValueError },
+            { input: 'FOO',     expected: InvalidLiteralError },
+            { input: 'BAR',     expected: InvalidLiteralError },
             { input: undefined, expected: undefined },
-            { input: 666,       expected: InvalidValueError }
+            { input: 666,       expected: InvalidLiteralError }
         ]
     },
 
@@ -93,7 +93,7 @@ const suites: TestSuite[] = [
             { input: 'FOO',     expected: 'FOO' },
             { input: 'BAR',     expected: 'BAR' },
             { input: undefined, expected: RequiredValueError },
-            { input: 666,       expected: InvalidValueError }
+            { input: 666,       expected: InvalidLiteralError }
         ]
     },
     {
@@ -103,12 +103,12 @@ const suites: TestSuite[] = [
             ignoreCase: false
         },
         testCases: [
-            { input: 'foo',     expected: InvalidValueError },
-            { input: 'bar',     expected: InvalidValueError },
+            { input: 'foo',     expected: InvalidLiteralError },
+            { input: 'bar',     expected: InvalidLiteralError },
             { input: 'FOO',     expected: 'FOO' },
             { input: 'BAR',     expected: 'BAR' },
             { input: undefined, expected: RequiredValueError },
-            { input: 666,       expected: InvalidValueError }
+            { input: 666,       expected: InvalidLiteralError }
         ]
     },
     {
@@ -123,7 +123,7 @@ const suites: TestSuite[] = [
             { input: 'FOO',     expected: 'FOO' },
             { input: 'BAR',     expected: 'BAR' },
             { input: undefined, expected: undefined },
-            { input: 666,       expected: InvalidValueError }
+            { input: 666,       expected: InvalidLiteralError }
         ]
     },
     {
@@ -133,12 +133,12 @@ const suites: TestSuite[] = [
             ignoreCase: false
         },
         testCases: [
-            { input: 'foo',     expected: InvalidValueError },
-            { input: 'bar',     expected: InvalidValueError },
+            { input: 'foo',     expected: InvalidLiteralError },
+            { input: 'bar',     expected: InvalidLiteralError },
             { input: 'FOO',     expected: 'FOO' },
             { input: 'BAR',     expected: 'BAR' },
             { input: undefined, expected: undefined },
-            { input: 666,       expected: InvalidValueError }
+            { input: 666,       expected: InvalidLiteralError }
         ]
     },
 
@@ -216,4 +216,65 @@ describe(`LiteralParser`, () => {
             }
         });
     }
+});
+describe('LiteralParser → InvalidLiteralError', () => {
+    function getError(parser: LiteralParser<LiteralParserOptions>, input: unknown): InvalidLiteralError {
+        try {
+            parser.parse(input);
+        } catch (err) {
+            if (err instanceof InvalidLiteralError) {
+                return err;
+            }
+
+            throw err;
+        }
+
+        throw new Error('Expected an InvalidLiteralError');
+    }
+
+    it(`expected contains every value, in declaration order`, (t: it.TestContext) => {
+        const p = new LiteralParser({ values: [ 'foo', 'bar', 'baz' ] });
+        const err = getError(p, 'caca');
+        t.assert.deepStrictEqual(err.expected, [ 'foo', 'bar', 'baz' ]);
+    });
+
+    it(`ignoreCase = true; expected keeps the declared case`, (t: it.TestContext) => {
+        const p = new LiteralParser({ values: [ 'ESNext', 'NodeNext' ], ignoreCase: true });
+        const err = getError(p, 'caca');
+        t.assert.deepStrictEqual(err.expected, [ 'ESNext', 'NodeNext' ]);
+    });
+
+    it(`expected is frozen`, (t: it.TestContext) => {
+        const p = new LiteralParser({ values: [ 'foo', 'bar' ] });
+        const err = getError(p, 'caca');
+        t.assert.ok(Object.isFrozen(err.expected));
+    });
+
+    it(`expected is not affected by mutating the values option`, (t: it.TestContext) => {
+        const values: [ string, ...string[] ] = [ 'foo', 'bar' ];
+        const p = new LiteralParser({ values });
+        values.push('baz');
+
+        const err = getError(p, 'baz');
+        t.assert.deepStrictEqual(err.expected, [ 'foo', 'bar' ]);
+    });
+
+    it(`received is the raw input`, (t: it.TestContext) => {
+        const p = new LiteralParser({ values: [ 'foo' ] });
+        const input = { foo: 'bar' };
+        const err = getError(p, input);
+        t.assert.strictEqual(err.received, input);
+    });
+
+    it(`parser is the LiteralParser`, (t: it.TestContext) => {
+        const p = new LiteralParser({ values: [ 'foo' ] });
+        const err = getError(p, 'caca');
+        t.assert.strictEqual(err.parser, p);
+    });
+
+    it(`is not an InvalidValueError`, (t: it.TestContext) => {
+        const p = new LiteralParser({ values: [ 'foo' ] });
+        const err = getError(p, 'caca');
+        t.assert.ok(!(err instanceof InvalidValueError));
+    });
 });

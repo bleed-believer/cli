@@ -1,8 +1,7 @@
 import type { ParserResult, LiteralParserOptions, LiteralParserResult } from './interfaces/index.ts';
 
-import { RequiredValueError, InvalidValueError, DuplicatedValueError } from './errors/index.ts';
+import { RequiredValueError, InvalidLiteralError, DuplicatedValueError } from './errors/index.ts';
 import { Parser } from './parser.ts';
-import { inspect } from 'node:util';
 
 /**
  * Parses a `string` that must be one of the given values, optionally
@@ -24,8 +23,8 @@ export class LiteralParser<
 > extends Parser<LiteralParserResult<O>, O> {
     /** The accepted values, indexed by their comparison key. */
     #values: Map<string, LiteralParserResult<O>>;
-    /** Description of the accepted values, used in error messages. */
-    #expected: string;
+    /** The accepted values, as declared in the options. */
+    #expected: readonly LiteralParserResult<O>[];
 
     /** Whether the comparison ignores case. */
     #ignoreCase: boolean;
@@ -53,14 +52,7 @@ export class LiteralParser<
             this.#values.set(key, value);
         }
 
-        const expected = Array
-            .from(this.#values.values())
-            .map(x => inspect(x))
-            .join(', ');
-
-        this.#expected = this.#values.size > 1
-        ?   `one of ${expected}`
-        :   expected;
+        this.#expected = Object.freeze(Array.from(this.#values.values()));
     }
 
     /**
@@ -77,7 +69,7 @@ export class LiteralParser<
      * Validates that the input is one of the accepted values.
      * @param input The raw value to parse.
      * @throws {RequiredValueError} If `input` is `undefined` and the parser is required.
-     * @throws {InvalidValueError} If `input` is not a string or does not match any value.
+     * @throws {InvalidLiteralError} If `input` is not a string or does not match any value.
      * @returns The matching value, as declared in the `values` option (not as received).
      */
     parse(input: unknown): ParserResult<LiteralParserResult<O>, O>;
@@ -98,6 +90,6 @@ export class LiteralParser<
             }
         }
 
-        throw new InvalidValueError(this, this.#expected, input);
+        throw new InvalidLiteralError(this, this.#expected, input);
     }
 }

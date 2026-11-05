@@ -1,6 +1,6 @@
 import type { ObjectParserOptions, ObjectParserResult, ParserResult } from './interfaces/index.ts';
 
-import { InvalidValueError, RequiredValueError } from './errors/index.ts';
+import { InvalidValueError, ParseObjectError, RequiredValueError } from './errors/index.ts';
 import { Parser } from './parser.ts';
 
 /**
@@ -41,7 +41,8 @@ export class ObjectParser<
      * @param input The raw value to parse.
      * @throws {RequiredValueError} If `input` is `undefined` and the parser is required.
      * @throws {InvalidValueError} If `input` is `null`, an array, a `Date` or not an object.
-     * @throws Any error thrown by the parser of a key.
+     * @throws {ParseObjectError} If a key cannot be parsed. The original error is
+     * available in its `cause`.
      * @returns A new object with the parsed keys.
      */
     parse(input: unknown): ParserResult<ObjectParserResult<O>, O>;
@@ -63,11 +64,16 @@ export class ObjectParser<
                 ) {
                     const output: any = {};
                     for (const [ k, p ] of Object.entries(this.#keys)) {
-                        const v = p.parse(
-                            Object.hasOwn(input, k)
-                            ?   (input as any)[k]
-                            :   undefined
-                        );
+                        let v: unknown;
+                        try {
+                            v = p.parse(
+                                Object.hasOwn(input, k)
+                                ?   (input as any)[k]
+                                :   undefined
+                            );
+                        } catch (err) {
+                            throw new ParseObjectError(p, k, err);
+                        }
 
                         if (typeof v !== 'undefined') {
                             Object.defineProperty(output, k, {
